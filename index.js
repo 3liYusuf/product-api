@@ -1,4 +1,10 @@
-const express = require("express");
+import express from "express";
+import mongoose from "mongoose";
+import routes from "./routes/routes.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const app = express();
 const port = 3000;
 
@@ -6,9 +12,7 @@ const port = 3000;
 app.use(express.json());
 
 // Define a route
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/", routes);
 
 // Start the server
 app.listen(port, () => {
