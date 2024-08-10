@@ -2,11 +2,14 @@ import express from "express";
 import mongoose from "mongoose";
 import routes from "./routes/routes.js";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
+// Enable CORS for all routes
 const app = express();
 const port = 3000;
+app.use(cors());
 
 // Middleware to parse JSON
 app.use(express.json());

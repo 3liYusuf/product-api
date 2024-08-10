@@ -1,39 +1,28 @@
+import User from "../models/User.js";
+
 export const login = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.body.email }).populate(
-      "roles",
-      "role"
-    ); //(varname, its Ref)
+    const { email, password } = req.body;
+    console.log(email, password);
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    console.log(user);
     if (!user) {
-      return next(CreateError(404, "User Not Found!"));
+      return res.status(404).json({ message: "User not found" });
     }
-    const { roles } = user;
 
-    const isPassCorrect = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-    if (!isPassCorrect) {
-      return next(CreateError(400, "Pass not correct!"));
+    // Check if the provided password matches the stored password
+    if (password !== user.password) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
-    const token = jwt.sign(
-      {
-        id: user._id,
-        isAdmin: user.isAdmin,
-        roles: roles,
-      },
-      process.env.JWT_SECRET
-    );
-    res.cookie("access_token", token, { httpOnly: true }).status(200).json({
-      status: 200,
-      message: "Login Success",
-      token: token,
+
+    // If the credentials are correct, return a success message
+    res.status(200).json({ message: "Login successful" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error during login",
+      error: error.message,
     });
-
-    // const savedUser = await User.findById(user._id);
-    // return next(CreateSuccess(200,"Login SuccessFully!", savedUser))
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
